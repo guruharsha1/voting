@@ -1,7 +1,7 @@
 "use client"  
 import { useState } from 'react';
 import prisma from '@/app/db';
-import update from './actions.tsx/update';
+import update from '../actions/update';
 const options = [
   'Contestant A',
   'Contestant B',
