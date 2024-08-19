@@ -15,7 +15,7 @@ const VotingComponent = () => {
     if (selectedOption !== null) {
       const updatedVotes = [...votes];
       updatedVotes[selectedOption] += 1;
-      await update(selectedContestant,selectedOption,updatedVotes);
+      await update(selectedContestant);
       setVotes(updatedVotes);
       setSelectedOption(0); 
     }
