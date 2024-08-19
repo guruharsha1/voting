@@ -3,6 +3,7 @@ import client from '@/app/db';
 import { NextRequest} from 'next/server';
 import rateLimit from 'next-rate-limit';
 import { cookies } from "next/headers";
+import { Cache } from '@/app/utils/cache';
 
 
 const limiter = rateLimit({
@@ -12,13 +13,12 @@ const limiter = rateLimit({
 
 
 async function withRateLimit(fn:any, req:NextRequest) {
-  const headers = limiter.checkNext(req, Number(process.env.VALUES_PER_MINUTE));
+  const headers = limiter.checkNext(req, 2);
   const remaining = headers.get('X-RateLimit-Remaining');
   if(!remaining){
     throw new Error('Rate limit exceeded');
   }
   if (remaining && remaining === '0') {
-    console.log(`Rate limit exceeded for user ${req.headers.get('X-User-ID')}`);
     throw new Error('Rate limit exceeded');
   }
 
@@ -32,6 +32,9 @@ export default async function update(selectedContestant : string) {
       throw new Error('No unique key found');
     }
 
+    if(Cache.getInstance().has('udaal')){
+      throw new Error('You have already voted');
+    }
     const dummyReq :unknown = { headers: new Map([['X-User-ID', uniqueKey]]) };
     
     await withRateLimit(async () => {

@@ -17,4 +17,5 @@ model Contestant{
   Id Int @id @default(autoincrement())
   Name String
   Votes Int
+  Nominated Boolean @default(false)
 }

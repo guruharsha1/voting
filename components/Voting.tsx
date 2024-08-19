@@ -1,7 +1,8 @@
 "use client"  
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import prisma from '@/app/db';
 import update from '../actions/update';
+import getVotes from '@/actions/votes';
 const options = [
   'Contestant A',
   'Contestant B',
@@ -11,14 +12,36 @@ const VotingComponent = () => {
   const [votes, setVotes] = useState(Array(options.length).fill(0));
   const [selectedOption, setSelectedOption] = useState<number>(0);
   const [selectedContestant, setSelectedContestant] = useState<string>('');
+
+  useEffect(() => {
+    const fetchVotes = async () => {
+      try {
+        const response = await getVotes();
+        if (!response.length) {
+          throw new Error('Network response was not ok');
+        }
+        const data = response.map((vote) => vote.Votes);
+        setVotes(data);
+      } catch (error) {
+        console.error('Error fetching votes:', error);
+      } 
+    };
+
+    fetchVotes();
+  }, []);
+
   const handleVote = async () => {
     if (selectedOption !== null) {
       const updatedVotes = [...votes];
       updatedVotes[selectedOption] += 1;
       await update(selectedContestant);
       setVotes(updatedVotes);
-      setSelectedOption(0); 
     }
+  };
+
+  const handleChange = (index) => {
+    setSelectedOption(index);
+    setSelectedContestant(options[index]);
   };
 
   return (
@@ -33,7 +56,7 @@ const VotingComponent = () => {
               name="vote"
               value={index}
               checked={selectedOption === index}
-              onChange={() => { setSelectedOption(index); setSelectedContestant(option) }}
+              onChange={() => { handleChange(index) }}
               className="form-radio h-5 w-5 text-blue-500"
             />
             <label htmlFor={`option-${index}`} className="text-lg">{option}</label>
