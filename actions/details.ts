@@ -2,7 +2,7 @@
 import client from '@/app/db';
 
 
-export default async function getVotes() {
+export default async function getDetails() {
     try{
         const votes = await client.contestant.findMany({
             where: {

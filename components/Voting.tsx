@@ -2,26 +2,24 @@
 import { useEffect, useState } from 'react';
 import prisma from '@/app/db';
 import update from '../actions/update';
-import getVotes from '@/actions/votes';
-const options = [
-  'Contestant A',
-  'Contestant B',
-];
+import getDetails from '@/actions/details';
 
 const VotingComponent = () => {
   const [votes, setVotes] = useState(Array(options.length).fill(0));
   const [selectedOption, setSelectedOption] = useState<number>(0);
   const [selectedContestant, setSelectedContestant] = useState<string>('');
+  const [options, setOptions] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchVotes = async () => {
       try {
-        const response = await getVotes();
+        const response = await getDetails();
         if (!response.length) {
           throw new Error('Network response was not ok');
         }
-        const data = response.map((vote) => vote.Votes);
-        setVotes(data);
+        setVotes(response.map((vote) => vote.Votes));
+        setOptions(response.map((vote) => vote.Name));
+
       } catch (error) {
         console.error('Error fetching votes:', error);
       } 
